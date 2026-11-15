@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to PNG Converter</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        input[type="file"] {
+            margin: 15px 0;
+            width: 100%;
+            color: #bbb;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 1px dashed #444;
+            margin: 15px 0;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>แปลงรูปเป็น .png</h2>
+        <input type="file" id="upload" accept="image/*">
+        <br>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <br>
+        <button id="downloadBtn" disabled>ดาวน์โหลดไฟล์ .png</button>
+    </div>
+
+    <script>
+        const upload = document.getElementById('upload');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const downloadBtn = document.getElementById('downloadBtn');
+        let uploadedImageName = 'converted_image.png';
+
+        upload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // เก็บนามสกุลเดิมไว้ตั้งชื่อไฟล์ใหม่
+            uploadedImageName = file.name.substring(0, file.name.lastIndexOf('.')) + '.png';
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    
+                    canvas.style.display = 'block';
+                    downloadBtn.disabled = false;
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        downloadBtn.addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.download = uploadedNameFix(uploadedImageName);
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        function uploadedNameFix(name) {
+            return name;
+        }
+    </script>
+
+</body>
+</html>
